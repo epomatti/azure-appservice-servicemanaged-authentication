@@ -3,9 +3,18 @@ variable "location" {
   default = "eastus2"
 }
 
-variable "sys" {
+variable "user_principal" {
+  type = string
+}
+
+variable "user_display_name" {
   type    = string
-  default = "myprivateapp"
+  default = "Jack"
+}
+
+variable "user_password" {
+  type    = string
+  default = "SecretP@sswd99!"
 }
 
 variable "app_sku_name" {

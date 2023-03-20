@@ -29,7 +29,7 @@ resource "random_id" "app_affix" {
 }
 
 locals {
-  app_name = "${var.sys}${lower(random_id.app_affix.hex)}"
+  app_name = "myprivateapp${lower(random_id.app_affix.hex)}"
   app_url  = "https://${local.app_name}.azurewebsites.net"
 }
 
@@ -37,7 +37,7 @@ locals {
 ### Group ###
 
 resource "azurerm_resource_group" "main" {
-  name     = "rg-${var.sys}"
+  name     = "rg-${local.app_name}"
   location = var.location
 }
 
@@ -48,7 +48,7 @@ resource "azurerm_resource_group" "main" {
 
 # resource "azuread_user" "main" {
 #   user_principal_name = var.app_user_principal
-#   display_name        = "John"
+#   display_name        = var.user_display_name
 #   password            = var.app_user_password
 # }
 
@@ -119,7 +119,7 @@ resource "azurerm_resource_group" "main" {
 ### App Services ###
 
 resource "azurerm_service_plan" "main" {
-  name                = "plan-${var.sys}"
+  name                = "plan-${local.app_name}"
   resource_group_name = azurerm_resource_group.main.name
   location            = azurerm_resource_group.main.location
   os_type             = "Linux"
@@ -128,7 +128,7 @@ resource "azurerm_service_plan" "main" {
 }
 
 resource "azurerm_linux_web_app" "main" {
-  name                = "app-${var.sys}"
+  name                = "app-${local.app_name}"
   resource_group_name = azurerm_resource_group.main.name
   location            = azurerm_service_plan.main.location
   service_plan_id     = azurerm_service_plan.main.id
@@ -160,14 +160,13 @@ resource "azurerm_linux_web_app" "main" {
     always_on = true
 
     application_stack {
-      docker_image     = "appsvc/staticsite"
+      docker_image     = "nginx"
       docker_image_tag = "latest"
     }
   }
 
   app_settings = {
-    DOCKER_REGISTRY_SERVER_URL = "https://mcr.microsoft.com"
+    DOCKER_REGISTRY_SERVER_URL = "https://index.docker.io"
     # APP_REGISTRATION_SECRET  = azuread_application_password.app.value
-    # WEBSITE_RUN_FROM_PACKAGE = 1
   }
 }
