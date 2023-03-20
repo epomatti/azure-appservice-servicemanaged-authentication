@@ -113,7 +113,6 @@ resource "azuread_service_principal" "app" {
 
 resource "azuread_application_password" "app" {
   application_object_id = azuread_application.app.object_id
-
 }
 
 ### Log Analytics ###
@@ -161,7 +160,7 @@ resource "azurerm_linux_web_app" "main" {
     default_provider       = "azureactivedirectory"
 
     login {
-
+      token_store_enabled = true
     }
 
     active_directory_v2 {
@@ -185,5 +184,12 @@ resource "azurerm_linux_web_app" "main" {
     APPLICATIONINSIGHTS_CONNECTION_STRING = azurerm_application_insights.app.connection_string
     DOCKER_REGISTRY_SERVER_URL            = "https://index.docker.io/v1"
     APP_REGISTRATION_SECRET               = azuread_application_password.app.value
+  }
+
+  lifecycle {
+    ignore_changes = [
+      # FIXME: Provider keeps trying to set it to "false". Change when provider is fixed.
+      auth_settings_v2.login.token_store_enabled
+    ]
   }
 }
