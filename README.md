@@ -1,0 +1,1 @@
+# azure-appservice-servicemanaged-authentication
