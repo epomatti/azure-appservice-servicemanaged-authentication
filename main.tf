@@ -106,15 +106,34 @@ resource "azuread_service_principal" "app" {
   application_id               = azuread_application.app.application_id
   app_role_assignment_required = false
   owners                       = [data.azuread_client_config.current.object_id]
-
-  # feature_tags {
-  #   enterprise = true
-  # }
+  feature_tags {
+    enterprise = true
+  }
 }
 
 resource "azuread_application_password" "app" {
   application_object_id = azuread_application.app.object_id
 
+}
+
+### Log Analytics ###
+
+resource "azurerm_log_analytics_workspace" "main" {
+  name                = "log-${local.app_name}"
+  location            = azurerm_resource_group.main.location
+  resource_group_name = azurerm_resource_group.main.name
+  sku                 = "PerGB2018"
+  retention_in_days   = 30
+}
+
+### Application Insights ###
+
+resource "azurerm_application_insights" "app" {
+  name                = "appi-${local.app_name}"
+  location            = azurerm_resource_group.main.location
+  resource_group_name = azurerm_resource_group.main.name
+  workspace_id        = azurerm_log_analytics_workspace.main.id
+  application_type    = "web"
 }
 
 ### App Services ###
@@ -129,7 +148,7 @@ resource "azurerm_service_plan" "main" {
 }
 
 resource "azurerm_linux_web_app" "main" {
-  name                = "app-${local.app_name}"
+  name                = local.app_name
   resource_group_name = azurerm_resource_group.main.name
   location            = azurerm_service_plan.main.location
   service_plan_id     = azurerm_service_plan.main.id
@@ -146,8 +165,7 @@ resource "azurerm_linux_web_app" "main" {
     }
 
     active_directory_v2 {
-      client_id = azuread_application.app.application_id
-      # tenant_auth_endpoint       = "https://login.microsoftonline.com/v2.0/${data.azuread_client_config.current.tenant_id}/"
+      client_id                  = azuread_application.app.application_id
       tenant_auth_endpoint       = "https://sts.windows.net/${data.azuread_client_config.current.tenant_id}/v2.0"
       client_secret_setting_name = "APP_REGISTRATION_SECRET"
       allowed_audiences          = [local.identifier_uri]
@@ -164,7 +182,8 @@ resource "azurerm_linux_web_app" "main" {
   }
 
   app_settings = {
-    DOCKER_REGISTRY_SERVER_URL = "https://index.docker.io/v1"
-    APP_REGISTRATION_SECRET    = azuread_application_password.app.value
+    APPLICATIONINSIGHTS_CONNECTION_STRING = azurerm_application_insights.app.connection_string
+    DOCKER_REGISTRY_SERVER_URL            = "https://index.docker.io/v1"
+    APP_REGISTRATION_SECRET               = azuread_application_password.app.value
   }
 }
