@@ -166,7 +166,7 @@ resource "azurerm_linux_web_app" "main" {
   }
 
   app_settings = {
-    DOCKER_REGISTRY_SERVER_URL = "https://index.docker.io"
+    DOCKER_REGISTRY_SERVER_URL = "https://index.docker.io/v1"
     # APP_REGISTRATION_SECRET  = azuread_application_password.app.value
   }
 }
