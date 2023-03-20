@@ -188,8 +188,78 @@ resource "azurerm_linux_web_app" "main" {
 
   lifecycle {
     ignore_changes = [
-      # FIXME: Provider keeps trying to set it to "false". Change when provider is fixed.
-      auth_settings_v2.login.token_store_enabled
+      # FIXME: Provider keeps trying to set it to "false". Remove this ignore when the provider is fixed.
+      auth_settings_v2[0].login[0].token_store_enabled
     ]
+  }
+}
+
+resource "azurerm_monitor_diagnostic_setting" "app" {
+  name                       = "Application Diagnostics"
+  target_resource_id         = azurerm_linux_web_app.main.id
+  log_analytics_workspace_id = azurerm_log_analytics_workspace.main.id
+
+  enabled_log {
+    category = "AppServiceHTTPLogs"
+
+    retention_policy {
+      days    = 7
+      enabled = true
+    }
+  }
+
+  enabled_log {
+    category = "AppServiceConsoleLogs"
+
+    retention_policy {
+      days    = 7
+      enabled = true
+    }
+  }
+
+  enabled_log {
+    category = "AppServiceAppLogs"
+
+    retention_policy {
+      days    = 7
+      enabled = true
+    }
+  }
+
+  enabled_log {
+    category = "AppServiceAuditLogs"
+
+    retention_policy {
+      days    = 7
+      enabled = true
+    }
+  }
+
+  enabled_log {
+    category = "AppServiceIPSecAuditLogs"
+
+    retention_policy {
+      days    = 7
+      enabled = true
+    }
+  }
+
+  enabled_log {
+    category = "AppServicePlatformLogs"
+
+    retention_policy {
+      days    = 7
+      enabled = true
+    }
+  }
+
+  metric {
+    category = "AllMetrics"
+    enabled  = true
+
+    retention_policy {
+      days    = 7
+      enabled = true
+    }
   }
 }
