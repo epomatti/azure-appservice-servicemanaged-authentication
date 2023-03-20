@@ -44,77 +44,77 @@ resource "azurerm_resource_group" "main" {
 
 ### Authentication ###
 
-# data "azuread_client_config" "current" {}
+data "azuread_client_config" "current" {}
 
-# resource "azuread_user" "main" {
-#   user_principal_name = var.app_user_principal
-#   display_name        = var.user_display_name
-#   password            = var.app_user_password
-# }
+resource "azuread_user" "main" {
+  user_principal_name = var.user_principal
+  display_name        = var.user_display_name
+  password            = var.user_password
+}
 
-# data "azuread_application_published_app_ids" "well_known" {}
+data "azuread_application_published_app_ids" "well_known" {}
 
-# resource "azuread_service_principal" "msgraph" {
-#   application_id = data.azuread_application_published_app_ids.well_known.result.MicrosoftGraph
-#   use_existing   = true
-# }
+resource "azuread_service_principal" "msgraph" {
+  application_id = data.azuread_application_published_app_ids.well_known.result.MicrosoftGraph
+  use_existing   = true
+}
 
-# resource "random_uuid" "oauth2_permission_scope" {}
+resource "random_uuid" "oauth2_permission_scope" {}
 
-# resource "azuread_application" "app" {
-#   display_name     = "app-${var.sys}"
-#   identifier_uris  = ["api://${var.sys}"]
-#   sign_in_audience = "AzureADMyOrg"
-#   owners           = [data.azuread_client_config.current.object_id]
+resource "azuread_application" "app" {
+  display_name     = "app-${local.app_name}"
+  identifier_uris  = ["api://${local.app_name}"]
+  sign_in_audience = "AzureADMyOrg"
+  owners           = [data.azuread_client_config.current.object_id]
 
-#   web {
-#     homepage_url  = local.app_url
-#     redirect_uris = ["${local.app_url}/.auth/login/aad/callback"]
+  web {
+    homepage_url  = local.app_url
+    redirect_uris = ["${local.app_url}/.auth/login/aad/callback"]
 
-#     implicit_grant {
-#       id_token_issuance_enabled = true
-#     }
-#   }
+    implicit_grant {
+      id_token_issuance_enabled = true
+    }
+  }
 
-#   api {
-#     requested_access_token_version = 2
+  api {
+    requested_access_token_version = 2
 
-#     oauth2_permission_scope {
-#       id                         = random_uuid.oauth2_permission_scope.result
-#       enabled                    = true
-#       type                       = "User"
-#       admin_consent_display_name = "Access File Upload"
-#       admin_consent_description  = "Allow the application to access File Upload on behalf of the signed-in user."
-#       user_consent_display_name  = "Access File Upload"
-#       user_consent_description   = "Allow the application to access File Upload on your behalf."
-#       value                      = "user_impersonation"
-#     }
-#   }
+    oauth2_permission_scope {
+      id                         = random_uuid.oauth2_permission_scope.result
+      enabled                    = true
+      type                       = "User"
+      admin_consent_display_name = "Access File Upload"
+      admin_consent_description  = "Allow the application to access File Upload on behalf of the signed-in user."
+      user_consent_display_name  = "Access File Upload"
+      user_consent_description   = "Allow the application to access File Upload on your behalf."
+      value                      = "user_impersonation"
+    }
+  }
 
-#   required_resource_access {
-#     resource_app_id = data.azuread_application_published_app_ids.well_known.result.MicrosoftGraph
+  required_resource_access {
+    resource_app_id = data.azuread_application_published_app_ids.well_known.result.MicrosoftGraph
 
-#     resource_access {
-#       id   = azuread_service_principal.msgraph.oauth2_permission_scope_ids["User.Read"] # User.Read.All
-#       type = "Scope"
-#     }
-#   }
-# }
+    resource_access {
+      id   = azuread_service_principal.msgraph.oauth2_permission_scope_ids["User.Read"] # User.Read.All
+      type = "Scope"
+    }
+  }
+}
 
-# resource "azuread_service_principal" "app" {
-#   application_id               = azuread_application.app.application_id
-#   app_role_assignment_required = false
-#   owners                       = [data.azuread_client_config.current.object_id]
+resource "azuread_service_principal" "app" {
+  application_id               = azuread_application.app.application_id
+  app_role_assignment_required = false
+  owners                       = [data.azuread_client_config.current.object_id]
 
-#   # feature_tags {
-#   #   enterprise = true
-#   # }
-# }
+  # feature_tags {
+  #   enterprise = true
+  # }
+}
 
-# resource "azuread_application_password" "app" {
-#   application_object_id = azuread_application.app.object_id
+resource "azuread_application_password" "app" {
+  application_object_id = azuread_application.app.object_id
 
-# }
+}
 
 ### App Services ###
 
