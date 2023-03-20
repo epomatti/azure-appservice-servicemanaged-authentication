@@ -138,14 +138,11 @@ resource "azurerm_linux_web_app" "main" {
   auth_settings_v2 {
     auth_enabled           = true
     require_authentication = true
-    unauthenticated_action = "RedirectToLoginPage" # RedirectToLoginPage
-    default_provider       = "BuiltInAuthenticationProviderAzureActiveDirectory"
-
-    # Required for AFD due to the "X-Forwarded-Host" header
-    # forward_proxy_convention = "Standard"
+    unauthenticated_action = "RedirectToLoginPage"
+    default_provider       = "azureactivedirectory"
 
     login {
-      token_store_enabled = true
+
     }
 
     active_directory_v2 {
