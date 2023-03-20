@@ -7,6 +7,4 @@ terraform init
 terraform apply -auto-approve
 ```
 
-**⚠️ As of the creation of this code, the Terraform Azurerm provider has issues related to the authentication feature.**
-
-Check [this issue](https://github.com/hashicorp/terraform-provider-azurerm/issues/20913) to apply the appropriate fixes or to follow-up on the solution.
+> **⚠️ As of the creation of this code, the Terraform Azurerm provider has issues related to the authentication feature. Check [this issue](https://github.com/hashicorp/terraform-provider-azurerm/issues/20913) to apply the appropriate fixes or to follow-up on the solution.**
