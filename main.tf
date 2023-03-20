@@ -29,8 +29,9 @@ resource "random_id" "app_affix" {
 }
 
 locals {
-  app_name = "myprivateapp${lower(random_id.app_affix.hex)}"
-  app_url  = "https://${local.app_name}.azurewebsites.net"
+  app_name       = "myprivateapp${lower(random_id.app_affix.hex)}"
+  app_url        = "https://${local.app_name}.azurewebsites.net"
+  identifier_uri = "api://${local.app_name}"
 }
 
 
@@ -63,7 +64,7 @@ resource "random_uuid" "oauth2_permission_scope" {}
 
 resource "azuread_application" "app" {
   display_name     = "app-${local.app_name}"
-  identifier_uris  = ["api://${local.app_name}"]
+  identifier_uris  = [local.identifier_uri]
   sign_in_audience = "AzureADMyOrg"
   owners           = [data.azuread_client_config.current.object_id]
 
@@ -95,7 +96,7 @@ resource "azuread_application" "app" {
     resource_app_id = data.azuread_application_published_app_ids.well_known.result.MicrosoftGraph
 
     resource_access {
-      id   = azuread_service_principal.msgraph.oauth2_permission_scope_ids["User.Read"] # User.Read.All
+      id   = azuread_service_principal.msgraph.oauth2_permission_scope_ids["User.Read"]
       type = "Scope"
     }
   }
@@ -134,27 +135,27 @@ resource "azurerm_linux_web_app" "main" {
   service_plan_id     = azurerm_service_plan.main.id
   https_only          = true
 
-  # auth_settings_v2 {
-  #   auth_enabled           = true
-  #   require_authentication = true
-  #   unauthenticated_action = "RedirectToLoginPage" # RedirectToLoginPage
-  #   default_provider       = "BuiltInAuthenticationProviderAzureActiveDirectory"
+  auth_settings_v2 {
+    auth_enabled           = true
+    require_authentication = true
+    unauthenticated_action = "RedirectToLoginPage" # RedirectToLoginPage
+    default_provider       = "BuiltInAuthenticationProviderAzureActiveDirectory"
 
-  #   # Required for AFD due to the "X-Forwarded-Host" header
-  #   # forward_proxy_convention = "Standard"
+    # Required for AFD due to the "X-Forwarded-Host" header
+    # forward_proxy_convention = "Standard"
 
-  #   login {
-  #     # token_store_enabled = false
-  #   }
+    login {
+      token_store_enabled = true
+    }
 
-  #   active_directory_v2 {
-  #     client_id = azuread_application.app.application_id
-  #     # tenant_auth_endpoint       = "https://login.microsoftonline.com/v2.0/${data.azuread_client_config.current.tenant_id}/"
-  #     tenant_auth_endpoint       = "https://sts.windows.net/${data.azuread_client_config.current.tenant_id}/v2.0"
-  #     client_secret_setting_name = "APP_REGISTRATION_SECRET"
-  #     allowed_audiences          = ["api://${var.sys}"]
-  #   }
-  # }
+    active_directory_v2 {
+      client_id = azuread_application.app.application_id
+      # tenant_auth_endpoint       = "https://login.microsoftonline.com/v2.0/${data.azuread_client_config.current.tenant_id}/"
+      tenant_auth_endpoint       = "https://sts.windows.net/${data.azuread_client_config.current.tenant_id}/v2.0"
+      client_secret_setting_name = "APP_REGISTRATION_SECRET"
+      allowed_audiences          = [local.identifier_uri]
+    }
+  }
 
   site_config {
     always_on = true
@@ -167,6 +168,6 @@ resource "azurerm_linux_web_app" "main" {
 
   app_settings = {
     DOCKER_REGISTRY_SERVER_URL = "https://index.docker.io/v1"
-    # APP_REGISTRATION_SECRET  = azuread_application_password.app.value
+    APP_REGISTRATION_SECRET    = azuread_application_password.app.value
   }
 }
