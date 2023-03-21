@@ -3,6 +3,10 @@ variable "location" {
   default = "eastus2"
 }
 
+variable "aad_domain" {
+  type = string
+}
+
 variable "user_principal" {
   type = string
 }

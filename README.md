@@ -19,6 +19,15 @@ Add the environment variables:
 
 docker build -t epomatti/dotnet-easyauth-api .
 
+```sh
+export AzureAd__Domain="<DOMAIN>"
+export AzureAd__TenantId="<TENANT_ID>"
+export AzureAd__ClientId="<CLIENT_ID>"
+
+export AzureAd__Domain="evandropomattigmail.onmicrosoft.com"
+export AzureAd__TenantId="94d47d96-52c0-4b73-b3ae-028fafc55d47"
+export AzureAd__ClientId="21e2f69b-7276-46a4-b9a1-42dab27a42cc"
+```
 
 ## References
 

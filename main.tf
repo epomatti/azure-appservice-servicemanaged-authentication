@@ -191,6 +191,11 @@ resource "azurerm_linux_web_app" "main" {
     APPLICATIONINSIGHTS_CONNECTION_STRING = azurerm_application_insights.app.connection_string
     DOCKER_REGISTRY_SERVER_URL            = "https://index.docker.io/v1"
     APP_REGISTRATION_SECRET               = azuread_application_password.app.value
+
+    # Microsoft.Identity.Web
+    AzureAd__Domain   = var.aad_domain
+    AzureAd__TenantId = data.azuread_client_config.current.tenant_id
+    AzureAd__ClientId = azuread_application.app.application_id
   }
 
   lifecycle {
