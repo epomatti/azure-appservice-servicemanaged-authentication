@@ -171,10 +171,10 @@ resource "azurerm_linux_web_app" "main" {
 
       # This configuration is required as per documentation to integrate package Microsoft.Identity.Web with Graph
       # https://learn.microsoft.com/en-us/azure/app-service/scenario-secure-app-access-microsoft-graph-as-user?tabs=azure-resource-explorer
-      login_parameters = [
-        "response_type=code id_token",
-        "scope=openid offline_access profile https://graph.microsoft.com/User.Read"
-      ]
+      login_parameters = {
+        response_type = "code id_token",
+        scope         = "openid offline_access profile https://graph.microsoft.com/User.Read"
+      }
     }
   }
 
