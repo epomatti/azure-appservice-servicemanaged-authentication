@@ -155,7 +155,7 @@ resource "azurerm_linux_web_app" "main" {
 
   auth_settings_v2 {
     auth_enabled           = true
-    require_authentication = true
+    require_authentication = false
     unauthenticated_action = "RedirectToLoginPage"
     default_provider       = "azureactivedirectory"
 
