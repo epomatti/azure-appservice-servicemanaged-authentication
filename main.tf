@@ -168,6 +168,13 @@ resource "azurerm_linux_web_app" "main" {
       tenant_auth_endpoint       = "https://sts.windows.net/${data.azuread_client_config.current.tenant_id}/v2.0"
       client_secret_setting_name = "APP_REGISTRATION_SECRET"
       allowed_audiences          = [local.identifier_uri]
+
+      # This configuration is required as per documentation to integrate package Microsoft.Identity.Web with Graph
+      # https://learn.microsoft.com/en-us/azure/app-service/scenario-secure-app-access-microsoft-graph-as-user?tabs=azure-resource-explorer
+      login_parameters = [
+        "response_type=code id_token",
+        "scope=openid offline_access profile https://graph.microsoft.com/User.Read"
+      ]
     }
   }
 

@@ -9,6 +9,16 @@ terraform apply -auto-approve
 
 > **⚠️ As of the creation of this code, the Terraform Azurerm provider has issues related to the authentication feature. Check [this issue](https://github.com/hashicorp/terraform-provider-azurerm/issues/20913) to apply the appropriate fixes or to follow-up on the solution.**
 
+## Local Development
+
+Create an application registration. No secrets are required for this demonstration.
+
+Add a redirect URL of type Web for `http://localhost:5269`.
+
+Add the environment variables:
+
+
+
 
 ## References
 
