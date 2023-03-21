@@ -17,7 +17,7 @@ Add a redirect URL of type Web for `http://localhost:5269`.
 
 Add the environment variables:
 
-
+docker build -t epomatti/dotnet-easyauth-api .
 
 
 ## References

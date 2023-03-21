@@ -19,7 +19,7 @@ variable "user_password" {
 
 variable "app_sku_name" {
   type    = string
-  default = "B2"
+  default = "B1"
 }
 
 variable "app_worker_count" {
