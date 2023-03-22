@@ -12,4 +12,9 @@ RUN dotnet publish -c Release -o out
 FROM mcr.microsoft.com/dotnet/aspnet:7.0
 WORKDIR /app
 COPY --from=build-env /app/out .
+
+# https://github.com/AzureAD/microsoft-identity-web/issues/115
+# https://github.com/AzureAD/microsoft-identity-web/wiki/Deploying-Web-apps-to-App-services-as-Linux-containers
+ENV ASPNETCORE_FORWARDEDHEADERS_ENABLED=true
+
 ENTRYPOINT ["dotnet", "api.dll"]

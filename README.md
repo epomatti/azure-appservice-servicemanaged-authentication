@@ -9,6 +9,8 @@ terraform apply -auto-approve
 
 > **⚠️ As of the creation of this code, the Terraform Azurerm provider has issues related to the authentication feature. Check [this issue](https://github.com/hashicorp/terraform-provider-azurerm/issues/20913) to apply the appropriate fixes or to follow-up on the solution.**
 
+For that reason, connect to the portal and create the authentication manually. `authsettingsV2` is completely broken via Terraform at this moment.
+
 ## Local Development
 
 Create an application registration. No secrets are required for this demonstration.
@@ -18,6 +20,8 @@ Add a redirect URL of type Web for `http://localhost:5269`.
 Add the environment variables:
 
 docker build -t epomatti/dotnet-easyauth-api .
+
+https://github.com/AzureAD/microsoft-identity-web/wiki/Deploying-Web-apps-to-App-services-as-Linux-containers
 
 ```sh
 export AzureAd__Domain="<DOMAIN>"
