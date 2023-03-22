@@ -182,28 +182,27 @@ resource "azurerm_linux_web_app" "main" {
     always_on = true
 
     application_stack {
-      docker_image     = "epomatti/dotnet-easyauth-api"
-      docker_image_tag = "latest"
+      dotnet_version = "7.0"
     }
   }
 
   app_settings = {
     APPLICATIONINSIGHTS_CONNECTION_STRING = azurerm_application_insights.app.connection_string
-    DOCKER_REGISTRY_SERVER_URL            = "https://index.docker.io/v1"
-    APP_REGISTRATION_SECRET               = azuread_application_password.app.value
+    # APP_REGISTRATION_SECRET               = azuread_application_password.app.value
+    WEBSITE_RUN_FROM_PACKAGE = 1
 
     # Microsoft.Identity.Web
-    AzureAd__Domain   = var.aad_domain
-    AzureAd__TenantId = data.azuread_client_config.current.tenant_id
-    AzureAd__ClientId = azuread_application.app.application_id
+    # AzureAd__Domain   = var.aad_domain
+    # AzureAd__TenantId = data.azuread_client_config.current.tenant_id
+    # AzureAd__ClientId = azuread_application.app.application_id
   }
 
-  lifecycle {
-    ignore_changes = [
-      # FIXME: Provider keeps trying to set it to "false". Remove this ignore when the provider is fixed.
-      auth_settings_v2[0].login[0].token_store_enabled
-    ]
-  }
+  # lifecycle {
+  #   ignore_changes = [
+  #     # FIXME: Provider keeps trying to set it to "false". Remove this ignore when the provider is fixed.
+  #     auth_settings_v2[0].login[0].token_store_enabled
+  #   ]
+  # }
 }
 
 resource "azurerm_monitor_diagnostic_setting" "app" {
