@@ -7,9 +7,20 @@ terraform init
 terraform apply -auto-approve
 ```
 
-> **⚠️ As of the creation of this code, the Terraform Azurerm provider has issues related to the authentication feature. Check [this issue](https://github.com/hashicorp/terraform-provider-azurerm/issues/20913) to apply the appropriate fixes or to follow-up on the solution.**
+> **⚠️ As of the creation of this code, the Terraform Azurerm provider has issues related to the authentication feature. Check [this issue](https://github.com/hashicorp/terraform-provider-azurerm/issues/20913) to apply the appropriate fixes or to follow-up on the solution. `authsettingsV2` is broken via Terraform at this moment.**
 
-For that reason, connect to the portal and create the authentication manually. `authsettingsV2` is completely broken via Terraform at this moment.
+For that reason, connect to the Portal and create the authentication manually. 
+
+Retrict access option should be: **`Require authentication`** with **`HTTP 302 Found redirect`**.
+
+Enter the application directory `cd api` and deploy the application:
+
+```
+bash build.sh
+
+az webapp deployment source config-zip -g rg-myprivateapp826cbe9f966915e2 -n myprivateapp826cbe9f966915e2 --src ./bin/api.zip
+```
+
 
 ## Local Development
 

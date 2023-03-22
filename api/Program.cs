@@ -4,11 +4,11 @@ using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
-                .AddMicrosoftIdentityWebApp(builder.Configuration.GetSection("AzureAd"))
-                    .EnableTokenAcquisitionToCallDownstreamApi()
-                        .AddMicrosoftGraph(builder.Configuration.GetSection("Graph"))
-                        .AddInMemoryTokenCaches();
+// builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
+//                 .AddMicrosoftIdentityWebApp(builder.Configuration.GetSection("AzureAd"))
+//                     .EnableTokenAcquisitionToCallDownstreamApi()
+//                         .AddMicrosoftGraph(builder.Configuration.GetSection("Graph"))
+//                         .AddInMemoryTokenCaches();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
