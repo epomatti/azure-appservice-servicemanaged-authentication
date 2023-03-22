@@ -13,6 +13,34 @@ For that reason, connect to the Portal and create the authentication manually.
 
 Retrict access option should be: **`Require authentication`** with **`HTTP 302 Found redirect`**.
 
+Now 
+
+
+```sh
+az rest --method GET --url '/subscriptions/{SUBSCRIPTION_ID}/resourceGroups/{RESOURCE_GROUP}/providers/Microsoft.Web/sites/{WEBAPP_NAME}/config/authsettingsv2/list?api-version=2022-03-01' > authsettings.json
+```
+
+```json
+"identityProviders": {
+    "azureActiveDirectory": {
+      "enabled": true,
+      "login": {
+        "loginParameters":[
+          "response_type=code id_token",
+          "scope=openid offline_access profile https://graph.microsoft.com/User.Read"
+        ]
+      }
+    }
+  }
+},
+```
+
+```sh
+az rest --method PUT --url '/subscriptions/{SUBSCRIPTION_ID}/resourceGroups/{RESOURCE_GROUP}/providers/Microsoft.Web/sites/{WEBAPP_NAME}/config/authsettingsv2?api-version=2022-03-01' --body @./authsettings.json
+```
+
+
+
 Enter the application directory `cd api` and deploy the application:
 
 ```
@@ -20,6 +48,7 @@ bash build.sh
 
 az webapp deployment source config-zip -g rg-myprivateapp826cbe9f966915e2 -n myprivateapp826cbe9f966915e2 --src ./bin/api.zip
 ```
+
 
 
 ## Local Development
@@ -43,6 +72,11 @@ export AzureAd__Domain="evandropomattigmail.onmicrosoft.com"
 export AzureAd__TenantId="94d47d96-52c0-4b73-b3ae-028fafc55d47"
 export AzureAd__ClientId="21e2f69b-7276-46a4-b9a1-42dab27a42cc"
 ```
+
+https://learn.microsoft.com/en-us/azure/active-directory/develop/scenario-web-api-call-api-overview
+https://stackoverflow.com/questions/69001458/asp-net-core-5-webapi-azure-ad-call-graph-api-using-azure-ad-access-token
+https://www.youtube.com/watch?v=pcWdR0LcNaI
+https://stackoverflow.com/questions/66530370/how-to-use-di-with-microsoft-graph
 
 ## References
 
