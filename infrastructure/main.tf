@@ -46,13 +46,6 @@ resource "azurerm_resource_group" "main" {
 ### Authentication ###
 
 data "azuread_client_config" "current" {}
-
-resource "azuread_user" "main" {
-  user_principal_name = var.user_principal
-  display_name        = var.user_display_name
-  password            = var.user_password
-}
-
 data "azuread_application_published_app_ids" "well_known" {}
 
 resource "azuread_service_principal" "msgraph" {
@@ -125,16 +118,6 @@ resource "azurerm_log_analytics_workspace" "main" {
   retention_in_days   = 30
 }
 
-### Application Insights ###
-
-resource "azurerm_application_insights" "app" {
-  name                = "appi-${local.app_name}"
-  location            = azurerm_resource_group.main.location
-  resource_group_name = azurerm_resource_group.main.name
-  workspace_id        = azurerm_log_analytics_workspace.main.id
-  application_type    = "web"
-}
-
 ### App Services ###
 
 resource "azurerm_service_plan" "main" {
@@ -146,12 +129,20 @@ resource "azurerm_service_plan" "main" {
   worker_count        = var.app_worker_count
 }
 
+
+### AAD Domain ###
+data "azuread_domains" "aad_domains" {
+  only_default = true
+}
+
 resource "azurerm_linux_web_app" "main" {
   name                = local.app_name
   resource_group_name = azurerm_resource_group.main.name
   location            = azurerm_service_plan.main.location
   service_plan_id     = azurerm_service_plan.main.id
   https_only          = true
+
+  # FIXME: Had to comment this due to bugs in the Terraform provider
 
   # auth_settings_v2 {
   #   auth_enabled           = true
@@ -179,32 +170,22 @@ resource "azurerm_linux_web_app" "main" {
   # }
 
   site_config {
-    always_on = true
+    always_on         = true
+    health_check_path = "/healthz"
 
     application_stack {
       dotnet_version = "7.0"
     }
-
-    # health_check_path = "/healthz"
   }
 
   app_settings = {
-    APPLICATIONINSIGHTS_CONNECTION_STRING = azurerm_application_insights.app.connection_string
-    # APP_REGISTRATION_SECRET               = azuread_application_password.app.value
     WEBSITE_RUN_FROM_PACKAGE = 1
 
     # Microsoft.Identity.Web
-    # AzureAd__Domain   = var.aad_domain
-    # AzureAd__TenantId = data.azuread_client_config.current.tenant_id
-    # AzureAd__ClientId = azuread_application.app.application_id
+    AzureAd__Domain   = data.azuread_domains.aad_domains.domains[0].domain_name
+    AzureAd__TenantId = data.azuread_client_config.current.tenant_id
+    AzureAd__ClientId = azuread_application.app.application_id
   }
-
-  # lifecycle {
-  #   ignore_changes = [
-  #     # FIXME: Provider keeps trying to set it to "false". Remove this ignore when the provider is fixed.
-  #     auth_settings_v2[0].login[0].token_store_enabled
-  #   ]
-  # }
 }
 
 resource "azurerm_monitor_diagnostic_setting" "app" {

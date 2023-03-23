@@ -45,6 +45,7 @@ Add the `"excludedPaths"` section:
 ```json
 "globalValidation": {
   "excludedPaths": [
+    "/api/dogs",
     "/healthz"
   ]
 }
