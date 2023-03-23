@@ -9,19 +9,14 @@ terraform init
 terraform apply -auto-approve
 ```
 
-Enter the `api` directory and deploy the application:
+`cd api`in the API directory and deploy the application:
 
 ```
-cd api
-
 bash build.sh
-
 az webapp deployment source config-zip -g <group> -n <app> --src ./bin/api.zip
 ```
 
-Test the application.
-
-The following URI paths are available as `GET` controllers:
+Test the application. The following URI paths are available as `GET` controllers:
 
 ```
 /api/dogs
@@ -36,7 +31,7 @@ For debugging, the `/.auth/me` is available.
 
 ## Local Development
 
-Create an application registration. No secrets are required for this demonstration. Add a redirect URL of type Web for `http://localhost:5269`.
+Create an application registration using the portal or cli. No secrets are required for this demonstration. Add a redirect URL of type Web for `http://localhost:5269/.auth/login/aad/callback`.
 
 Add the environment variables:
 
