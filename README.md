@@ -13,7 +13,9 @@ For that reason, connect to the Portal and create the authentication manually.
 
 Retrict access option should be: **`Require authentication`** with **`HTTP 302 Found redirect`**.
 
-Now 
+Create a user. Add claims.
+
+Now update App Services.
 
 
 ```sh
@@ -34,6 +36,15 @@ az rest --method GET --url '/subscriptions/{SUBSCRIPTION_ID}/resourceGroups/{RES
   }
 },
 ```
+
+```json
+"globalValidation": {
+  "excludedPaths": [
+    "/healthz"
+  ]
+}
+```
+
 
 ```sh
 az rest --method PUT --url '/subscriptions/{SUBSCRIPTION_ID}/resourceGroups/{RESOURCE_GROUP}/providers/Microsoft.Web/sites/{WEBAPP_NAME}/config/authsettingsv2?api-version=2022-03-01' --body @./authsettings.json
@@ -77,6 +88,7 @@ https://learn.microsoft.com/en-us/azure/active-directory/develop/scenario-web-ap
 https://stackoverflow.com/questions/69001458/asp-net-core-5-webapi-azure-ad-call-graph-api-using-azure-ad-access-token
 https://www.youtube.com/watch?v=pcWdR0LcNaI
 https://stackoverflow.com/questions/66530370/how-to-use-di-with-microsoft-graph
+https://learn.microsoft.com/en-us/azure/app-service/tutorial-auth-aad?pivots=platform-linux#call-api-securely-from-server-code
 
 ## References
 

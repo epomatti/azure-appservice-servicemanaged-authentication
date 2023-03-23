@@ -184,6 +184,8 @@ resource "azurerm_linux_web_app" "main" {
     application_stack {
       dotnet_version = "7.0"
     }
+
+    # health_check_path = "/healthz"
   }
 
   app_settings = {
