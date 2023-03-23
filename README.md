@@ -11,49 +11,11 @@ terraform apply -auto-approve
 
 > **⚠️ As of the creation of this code, the Terraform Azurerm provider has issues with App Service authentication via `authsettingsV2`. Check [this issue](https://github.com/hashicorp/terraform-provider-azurerm/issues/20913) to apply the appropriate fixes or to follow-up on the solution.**
 
-For that reason, connect to the Portal and create the AAD authentication manually via the `Authentication` blade in your App Service.
+For that reason, connect to the Portal and create the AAD authentication manually via the `Authentication` blade in your App Service and _select the existing App Registration_ that was created by Terraform.
 
-Retrict access option should be: **`Require authentication`** with **`HTTP 401 Unauthorized: recommended for APIs`**.
+Retrict access option should be: **`Require authentication`** with **`HTTP 401 Unauthorized: recommended for APIs`**..
 
 Also, create a user and security groups associated.
-
-Now update App Services to forward the required login parameters to the application.
-
-```sh
-az rest --method GET --url '/subscriptions/{SUBSCRIPTION_ID}/resourceGroups/{RESOURCE_GROUP}/providers/Microsoft.Web/sites/{WEBAPP_NAME}/config/authsettingsv2/list?api-version=2022-03-01' > authsettings.json
-```
-
-Add the `"loginParameters"` section:
-
-```json
-"identityProviders": {
-  "azureActiveDirectory": {
-    "enabled": true,
-    "login": {
-      "loginParameters": [
-        "response_type=code id_token",
-        "scope=openid offline_access profile https://graph.microsoft.com/User.Read"
-      ]
-    }
-  }
-}
-```
-
-Add the `"excludedPaths"` section:
-
-```json
-"globalValidation": {
-  "excludedPaths": [
-    "/api/dogs",
-    "/healthz"
-  ]
-}
-```
-Update the new configuration:
-
-```sh
-az rest --method PUT --url '/subscriptions/{SUBSCRIPTION_ID}/resourceGroups/{RESOURCE_GROUP}/providers/Microsoft.Web/sites/{WEBAPP_NAME}/config/authsettingsv2?api-version=2022-03-01' --body @./authsettings.json
-```
 
 Enter the application directory and deploy the application:
 
