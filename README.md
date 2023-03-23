@@ -13,11 +13,11 @@ terraform apply -auto-approve
 
 For that reason, connect to the Portal and create the AAD authentication manually via the `Authentication` blade in your App Service.
 
-Retrict access option should be: **`Require authentication`** with **`HTTP 302 Found redirect`**.
+Retrict access option should be: **`Require authentication`** with **`HTTP 401 Unauthorized: recommended for APIs`**.
 
 Also, create a user and security groups associated.
 
-Now update App Services to forwardt he required login parameters to the application.
+Now update App Services to forward the required login parameters to the application.
 
 ```sh
 az rest --method GET --url '/subscriptions/{SUBSCRIPTION_ID}/resourceGroups/{RESOURCE_GROUP}/providers/Microsoft.Web/sites/{WEBAPP_NAME}/config/authsettingsv2/list?api-version=2022-03-01' > authsettings.json
@@ -27,17 +27,16 @@ Add the `"loginParameters"` section:
 
 ```json
 "identityProviders": {
-    "azureActiveDirectory": {
-      "enabled": true,
-      "login": {
-        "loginParameters":[
-          "response_type=code id_token",
-          "scope=openid offline_access profile https://graph.microsoft.com/User.Read"
-        ]
-      }
+  "azureActiveDirectory": {
+    "enabled": true,
+    "login": {
+      "loginParameters": [
+        "response_type=code id_token",
+        "scope=openid offline_access profile https://graph.microsoft.com/User.Read"
+      ]
     }
   }
-},
+}
 ```
 
 Add the `"excludedPaths"` section:
