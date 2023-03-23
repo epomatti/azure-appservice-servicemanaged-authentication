@@ -1,26 +1,29 @@
 # App Services + AAD Service Managed Authentication
 
-Demonstration of App Service [built-in authentication](https://learn.microsoft.com/en-us/azure/app-service/overview-authentication-authorization).
+Demonstration of App Service [built-in authentication](https://learn.microsoft.com/en-us/azure/app-service/overview-authentication-authorization) feature.
 
 ```sh
+cd infrastructure
+
 terraform init
 terraform apply -auto-approve
 ```
 
-> **⚠️ As of the creation of this code, the Terraform Azurerm provider has issues related to the authentication feature. Check [this issue](https://github.com/hashicorp/terraform-provider-azurerm/issues/20913) to apply the appropriate fixes or to follow-up on the solution. `authsettingsV2` is broken via Terraform at this moment.**
+> **⚠️ As of the creation of this code, the Terraform Azurerm provider has issues with App Service authentication via `authsettingsV2`. Check [this issue](https://github.com/hashicorp/terraform-provider-azurerm/issues/20913) to apply the appropriate fixes or to follow-up on the solution.**
 
-For that reason, connect to the Portal and create the authentication manually. 
+For that reason, connect to the Portal and create the AAD authentication manually via the `Authentication` blade in your App Service.
 
 Retrict access option should be: **`Require authentication`** with **`HTTP 302 Found redirect`**.
 
-Create a user. Add claims.
+Also, create a user and security groups associated.
 
-Now update App Services.
-
+Now update App Services to forwardt he required login parameters to the application.
 
 ```sh
 az rest --method GET --url '/subscriptions/{SUBSCRIPTION_ID}/resourceGroups/{RESOURCE_GROUP}/providers/Microsoft.Web/sites/{WEBAPP_NAME}/config/authsettingsv2/list?api-version=2022-03-01' > authsettings.json
 ```
+
+Add the `"loginParameters"` section:
 
 ```json
 "identityProviders": {
@@ -37,6 +40,8 @@ az rest --method GET --url '/subscriptions/{SUBSCRIPTION_ID}/resourceGroups/{RES
 },
 ```
 
+Add the `"excludedPaths"` section:
+
 ```json
 "globalValidation": {
   "excludedPaths": [
@@ -44,23 +49,31 @@ az rest --method GET --url '/subscriptions/{SUBSCRIPTION_ID}/resourceGroups/{RES
   ]
 }
 ```
-
+Update the new configuration:
 
 ```sh
 az rest --method PUT --url '/subscriptions/{SUBSCRIPTION_ID}/resourceGroups/{RESOURCE_GROUP}/providers/Microsoft.Web/sites/{WEBAPP_NAME}/config/authsettingsv2?api-version=2022-03-01' --body @./authsettings.json
 ```
 
-
-
-Enter the application directory `cd api` and deploy the application:
+Enter the application directory and deploy the application:
 
 ```
+cd api
+
 bash build.sh
 
 az webapp deployment source config-zip -g rg-myprivateapp826cbe9f966915e2 -n myprivateapp826cbe9f966915e2 --src ./bin/api.zip
 ```
 
+The following URI paths are available as `GET` controllers:
 
+```
+/api/dogs
+/api/claims
+/api/healthz
+```
+
+For debugging, the `/.auth/me` is available.
 
 ## Local Development
 
