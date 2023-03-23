@@ -178,8 +178,8 @@ resource "azapi_update_resource" "auth_settings_v2" {
   body = jsonencode({
     properties = {
       "globalValidation" : {
-        "requireAuthentication" : true,
-        "unauthenticatedClientAction" : "Return401",
+        "requireAuthentication" : var.require_authentication,
+        "unauthenticatedClientAction" : var.unauthenticated_client_action,
         "excludedPaths" : [
           "/api/dogs",
           "/healthz"
