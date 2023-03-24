@@ -9,7 +9,7 @@ terraform init
 terraform apply -auto-approve
 ```
 
-`cd api`in the API directory and deploy the application:
+`cd api` into the API directory and deploy the application:
 
 ```
 bash build.sh
