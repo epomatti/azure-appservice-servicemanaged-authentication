@@ -2,6 +2,8 @@
 
 Demonstration of App Service [built-in authentication](https://learn.microsoft.com/en-us/azure/app-service/overview-authentication-authorization) feature.
 
+## Running on Azure
+
 ```sh
 cd infrastructure
 
